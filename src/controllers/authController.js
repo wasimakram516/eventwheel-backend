@@ -13,45 +13,60 @@ const env = require("../config/env");
 
 // ✅ Register User
 const register = asyncHandler(async (req, res) => {
-  const { name, email, password } = validateRegisterDTO(req.body);
+  try {
+    const { name, email, password } = validateRegisterDTO(req.body);
 
-  const existingUser = await User.findOne({ email: email.toLowerCase() });
-  if (existingUser) return response(res, 400, "User with this email already exists.");
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser)
+      return response(res, 400, "User with this email already exists.");
 
-  const newUser = await User.create({
-    name,
-    email: email.toLowerCase(),
-    password,
-  });
+    const newUser = await User.create({
+      name,
+      email: email.toLowerCase(),
+      password,
+    });
 
-  return response(res, 201, "User registered successfully", newUser);
+    return response(res, 201, "User registered successfully", newUser);
+  } catch (error) {
+    // ✅ This catches the CustomError from validateLoginDTO
+    console.log("Login controller error:", error.message); // Debug log
+    return response(res, error.statusCode || 400, error.message);
+  }
 });
 
 // ✅ Login User (Supports "Remember Me" Feature)
 const login = asyncHandler(async (req, res) => {
-  const { email, password, rememberMe } = validateLoginDTO(req.body);
+  try {
+    const { email, password, rememberMe } = validateLoginDTO(req.body);
 
-  const user = await User.findOne({ email: email.toLowerCase() });
-  if (!user) return response(res, 400, "Invalid credentials.");
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) return response(res, 400, "Invalid credentials.");
 
-  const isPasswordValid = await verifyPassword(password, user.password);
-  if (!isPasswordValid) return response(res, 400, "Invalid credentials.");
+    const isPasswordValid = await verifyPassword(password, user.password);
+    if (!isPasswordValid) return response(res, 400, "Invalid credentials.");
 
-  const accessToken = generateAccessToken(user);
-  const refreshToken = generateRefreshToken(user);
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
 
-  // ✅ Set Refresh Token Expiry (7 days by default, 30 days if "Remember Me" is checked)
-  const refreshExpiry = rememberMe ? 30 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000; // 30 days or 7 days
+    // ✅ Set Refresh Token Expiry (7 days by default, 30 days if "Remember Me" is checked)
+    const refreshExpiry = rememberMe
+      ? 30 * 24 * 60 * 60 * 1000
+      : 7 * 24 * 60 * 60 * 1000; // 30 days or 7 days
 
-  // ✅ Store refresh token in HTTP-only cookie
-  res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: env.node_env.toLowerCase() === "production",
-    sameSite: "Strict",
-    maxAge: refreshExpiry,
-  });
+    // ✅ Store refresh token in HTTP-only cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: env.node_env.toLowerCase() === "production",
+      sameSite: "Strict",
+      maxAge: refreshExpiry,
+    });
 
-  return response(res, 200, "Login successful", { accessToken });
+    return response(res, 200, "Login successful", { accessToken });
+  } catch (error) {
+    // ✅ This catches the CustomError from validateLoginDTO
+    console.log("Login controller error:", error.message); // Debug log
+    return response(res, error.statusCode || 400, error.message);
+  }
 });
 
 // ✅ Refresh Access Token (Uses Refresh Token from HTTP-Only Cookie)
@@ -61,7 +76,8 @@ const refreshToken = asyncHandler(async (req, res) => {
 
   // ✅ Verify Refresh Token
   const decoded = verifyToken(refreshToken);
-  if (!decoded) return response(res, 403, "Refresh token expired. Please log in again.");
+  if (!decoded)
+    return response(res, 403, "Refresh token expired. Please log in again.");
 
   const user = await User.findById(decoded.id);
   if (!user) return response(res, 403, "User not found.");
