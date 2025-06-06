@@ -13,7 +13,6 @@ const env = require("../config/env");
 
 // ✅ Register User
 const register = asyncHandler(async (req, res) => {
-  try {
     const { name, email, password } = validateRegisterDTO(req.body);
 
     const existingUser = await User.findOne({ email: email.toLowerCase() });
@@ -27,16 +26,10 @@ const register = asyncHandler(async (req, res) => {
     });
 
     return response(res, 201, "User registered successfully", newUser);
-  } catch (error) {
-    // ✅ This catches the CustomError from validateLoginDTO
-    console.log("Login controller error:", error.message); // Debug log
-    return response(res, error.statusCode || 400, error.message);
-  }
 });
 
 // ✅ Login User (Supports "Remember Me" Feature)
 const login = asyncHandler(async (req, res) => {
-  try {
     const { email, password, rememberMe } = validateLoginDTO(req.body);
 
     const user = await User.findOne({ email: email.toLowerCase() });
@@ -62,11 +55,6 @@ const login = asyncHandler(async (req, res) => {
     });
 
     return response(res, 200, "Login successful", { accessToken });
-  } catch (error) {
-    // ✅ This catches the CustomError from validateLoginDTO
-    console.log("Login controller error:", error.message); // Debug log
-    return response(res, error.statusCode || 400, error.message);
-  }
 });
 
 // ✅ Refresh Access Token (Uses Refresh Token from HTTP-Only Cookie)

@@ -6,18 +6,19 @@ const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const seedAdmin = require("./src/seeder/adminSeeder");
 const env = require("./src/config/env");
+const errorHandler = require("./src/middlewares/errorHandler");
 
 const app = express();
 
-app.use(express.json()); 
+app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
 
 app.use(
   cors({
-    origin: env.client.client_url, 
-    credentials: true, 
-    methods: ["*"], 
+    origin: env.client.client_url,
+    credentials: true,
+    methods: ["*"],
     allowedHeaders: [
       "Content-Type",
       "Authorization",
@@ -38,6 +39,7 @@ mongoose
     app.use("/api/events", require("./src/routes/eventRoutes"));
     app.use("/api/participants", require("./src/routes/participantRoutes"));
 
+    app.use(errorHandler);
     const PORT = env.server.port || 5000;
     app.listen(PORT, () => {
       console.log(`🚀 Backend running on http://localhost:${PORT}`);
