@@ -34,7 +34,7 @@ app.options("*", cors());
 app.get("/", (req, res) => {
   console.log("📡 Server is running...");
   res.status(200).send("OK");
-});
+}); 
 
 mongoose
   .connect(env.database.url)
