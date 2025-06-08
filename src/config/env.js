@@ -1,4 +1,4 @@
-require("dotenv").config({ path: ".env.example" });
+require("dotenv").config({ path: ".env.local" });
 
 // Function to validate required environment variables
 const validateEnv = (key) => {
