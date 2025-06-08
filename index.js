@@ -4,7 +4,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
-
+const seedAdmin = require("./src/seeder/adminSeeder");
 const env = require("./src/config/env");
 
 const app = express();
@@ -31,9 +31,9 @@ app.options("*", cors());
 
 mongoose
   .connect(env.database.url)
-  .then(() => {
+  .then(async () => {
     console.log("✅ MongoDB connected successfully.");
-
+    await seedAdmin();
     app.use("/api/auth", require("./src/routes/authRoutes"));
     app.use("/api/events", require("./src/routes/eventRoutes"));
     app.use("/api/participants", require("./src/routes/participantRoutes"));
