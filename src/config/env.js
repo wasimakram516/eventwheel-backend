@@ -19,9 +19,6 @@ const env = {
     accessExpiry: validateEnv("JWT_ACCESS_EXPIRY"),
     refreshExpiry: validateEnv("JWT_REFRESH_EXPIRY"),
   },
-  client: {
-    client_url: validateEnv("CLIENT_URL"),
-  },
   server: {
     port: validateEnv("PORT"),
   },

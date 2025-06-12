@@ -16,7 +16,7 @@ app.use(morgan("dev"));
 
 app.use(
   cors({
-    origin: env.client.client_url,
+    origin: ["http://localhost:3000", "https://eventwheel.whitewall.om", "https://eventwheel-whitewall.vercel.app"],
     credentials: true,
     methods: ["*"],
     allowedHeaders: [
