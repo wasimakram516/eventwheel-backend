@@ -18,7 +18,7 @@ app.use(
   cors({
     origin: ["http://localhost:3000", "https://eventwheel.whitewall.om", "https://eventwheel-whitewall.vercel.app"],
     credentials: true,
-    methods: ["*"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: [
       "Content-Type",
       "Authorization",
